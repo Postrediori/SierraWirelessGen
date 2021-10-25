@@ -25,16 +25,6 @@ MIT License
     "MDM9x06": ["WP77xx"],
     "MDM9x07": ["SWI9X07Y", "WP76xx"]
     
-## Installation
-
-- Get python >=3.6 64-Bit
-
-    ```bash
-    ~> git clone https://github.com/bkerler/SierraWirelessGen
-    ~> chmod +x SierraWirelessGen/sierrakeygen.py
-    ~> pip3 install -r requirements.txt
-    ```
-
 ## Usage
 
 - Get a specific challenge for your task from the modem
@@ -57,13 +47,13 @@ MIT License
 - Run generator:
     For automatic unlock, use -u:
     ```bash
-    ~> ./sierrakeygen.py -u
+    ~> sierrakeygen -u
     ```
 
     For AT!OPENLOCK use -l, for AT!OPENMEP use -m and for AT!OPENCND use -c accordingly
     (here challenge is BE96CBBEE0829BCA and device generation is MDM9200)
     ```bash
-    ~> ./sierrakeygen.py -l BE96CBBEE0829BCA -d MDM9200
+    ~> sierrakeygen -l BE96CBBEE0829BCA -d MDM9200
     ```
 
 - Send generated response back to the modem
@@ -111,7 +101,7 @@ MIT License
 ## Help
 
     ```bash
-    ~> ./sierrakeygen.py -h
+    ~> sierrakeygen -h
     ```
 
 ## Remarks
