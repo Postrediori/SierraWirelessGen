@@ -76,7 +76,7 @@ infotable = {
     "MDM9x30_V1": ["Netgear AC790/MDM9230"],
     "MDM9x40": ["AC815s", "AC785s", "AC797S", "MR1100"],
     "MDM9x50": ["EM7565", "EM7565-9", "EM7511", "EM7411"],
-    "SDX55" : ["MR5100"]
+    "SDX55" : ["MR5100","ac797-100eus"]
 }
 
 keytable = bytearray([0xF0, 0x14, 0x55, 0x0D, 0x5E, 0xDA, 0x92, 0xB3, 0xA7, 0x6C, 0xCE, 0x84, 0x90, 0xBC, 0x7F, 0xED,
@@ -113,19 +113,19 @@ keytable = bytearray([0xF0, 0x14, 0x55, 0x0D, 0x5E, 0xDA, 0x92, 0xB3, 0xA7, 0x6C
                       0x98, 0xE1, 0xC1, 0x93, 0xC3, 0xBF, 0xC3, 0x50, 0x8D, 0xA1, 0x35, 0xFE, 0x50, 0x47, 0xB3, 0xC4,
                       # 15 NTG9X35C_02.08.29.00 Openmep Key AC791L/AC790S Old
                       0x61, 0x94, 0xCE, 0xA7, 0xB0, 0xEA, 0x4F, 0x0A, 0x73, 0xC5, 0xC3, 0xA6, 0x5E, 0xEC, 0x1C, 0xE2,
-                      # 16 NTG9X35C_02.08.29.00 Openmep Key AC791/AC790S, NTGX55_10.25.15.02 MR5100 Alternative
+                      # 16 NTG9X35C_02.08.29.00 Openmep Key AC791/AC790S, NTGX55_10.25.15.02 MR5100 Alternative, NTG9X40C_30.00.12.00 Alternative
                       0xC5, 0x50, 0x40, 0xDA, 0x23, 0xE8, 0xF4, 0x4C, 0x29, 0xE9, 0x07, 0xDE, 0x24, 0xE5, 0x2C, 0x1D,
                       # 17 NTG9X35C_02.08.29.00 Openlock Key AC791/AC790S Old
                       0xF0, 0x14, 0x55, 0x0D, 0x5E, 0xDA, 0x92, 0xB3, 0xA7, 0x6C, 0xCE, 0x84, 0x90, 0xBC, 0x7F, 0xED,
-                      # 18 NTG9X35C_02.08.29.00 Openlock Key AC791/AC790S, NTGX55_10.25.15.02 MR5100 Alternative
+                      # 18 NTG9X35C_02.08.29.00 Openlock Key AC791/AC790S, NTGX55_10.25.15.02 MR5100 Alternative, NTG9X40C_30.00.12.00 Alternative
                       0x78, 0x19, 0xC5, 0x6D, 0xC3, 0xD8, 0x25, 0x3E, 0x51, 0x60, 0x8C, 0xA7, 0x32, 0x83, 0x37, 0x9D,
                       # 19 SWI9X06Y_02.14.04.00 Openmep Key WP77xx
                       0x12, 0xF0, 0x79, 0x6B, 0x19, 0xC7, 0xF4, 0xEC, 0x50, 0xF3, 0x8C, 0x40, 0x02, 0xC9, 0x43, 0xC8,
                       # 20 SWI9X06Y_02.14.04.00 Openlock Key WP77xx
                       0x49, 0x42, 0xFF, 0x76, 0x8A, 0x95, 0xCF, 0x7B, 0xA3, 0x47, 0x5F, 0xF5, 0x8F, 0xD8, 0x45, 0xE4,
-                      # 21 NTGX55 Openmep Key, NTGX55_10.25.15.02 MR5100
+                      # 21 NTGX55 Openmep Key, NTGX55_10.25.15.02 MR5100, NTG9X40C_30.00.12.00
                       0xF8, 0x1A, 0x3A, 0xCC, 0xAA, 0x2B, 0xA5, 0xE8, 0x8B, 0x53, 0x5A, 0x55, 0xB9, 0x65, 0x57, 0x98,
-                      # 22 NTGX55 Openlock Key, NTGX55_10.25.15.02 MR5100
+                      # 22 NTGX55 Openlock Key, NTGX55_10.25.15.02 MR5100, NTG9X40C_30.00.12.00
                       0x54, 0xC9, 0xC7, 0xA4, 0x02, 0x1C, 0xB0, 0x11, 0x05, 0x22, 0x39, 0xB7, 0x84, 0xEF, 0x16, 0xCA,
                       # 23 NTG9X15A Openlock Key, NTG9X15A_01.08.02.00
                       0xC7, 0xE6, 0x39, 0xFE, 0x0A, 0xC7, 0xCA, 0x4D, 0x49, 0x8F, 0xD8, 0x55, 0xEB, 0x1A, 0xCD, 0x8A
@@ -476,7 +476,7 @@ class SierraKeygen:
                             devicegeneration = "MDM9x30_V1"
                         else:
                             devicegeneration = "MDM9x30"
-                    elif "9X40" in revision:
+                    elif "9X40" in revision and not "9X40C" in revision:
                         devicegeneration = "MDM9x40"
                     elif "9X50" in revision:
                         if "NTG9X50" in revision:
@@ -485,7 +485,7 @@ class SierraKeygen:
                             devicegeneration = "MDM9x50"
                     elif "9X06" in revision:
                         devicegeneration = "MDM9x06"
-                    elif "X55" in revision:
+                    elif "X55" in revision or "9X40C" in revision:
                         if "NTGX55" in revision: #MR5100 NTGX55_10.25.15.02
                             devicegeneration = "SDX55"
                         devicegeneration = "SDX55"
