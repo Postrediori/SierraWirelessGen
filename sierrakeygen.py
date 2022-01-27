@@ -4,7 +4,6 @@
 # If you use my code, make sure you refer to my name
 # If you want to use in a commercial product, ask me before integrating it
 
-import serial
 import sys
 import argparse
 import time
@@ -138,12 +137,12 @@ class SierraGenerator():
     rtbl = bytearray()
 
     def __init__(self):
-        for i in range(0, 0x14):
+        for _ in range(0, 0x14):
             self.rtbl.append(0x0)
-        for i in range(0, 0x100):
+        for _ in range(0, 0x100):
             self.tbl.append(0x0)
 
-    def run(self, devicegeneration, challenge, type):
+    def run(self, devicegeneration, challenge, _type):
         challenge = bytearray(unhexlify(challenge))
 
         self.devicegeneration = devicegeneration
@@ -156,99 +155,48 @@ class SierraGenerator():
         lockid = prodtable[devicegeneration]["openlock"]
         clen = prodtable[devicegeneration]["clen"]
         if len(challenge) < clen:
-            for i in range(0, clen - len(challenge)):
-                challenge.append(0)
+            challenge=[0 for _ in range(0, clen - len(challenge))]
 
         challengelen = len(challenge)
-        if type == 0:  # lockkey
+        if _type == 0:  # lockkey
             idf = lockid
-        elif type == 1:  # mepkey
+        elif _type == 1:  # mepkey
             idf = mepid
-        elif type == 2:  # cndkey
+        elif _type == 2:  # cndkey
             idf = cndid
 
         key = keytable[idf * 16:(idf * 16) + 16]
-        resp = self.SierraKeygen(challenge, key, challengelen, 16)[:challengelen]
+        resp = self.SierraKeygen(challenge=challenge, key=key, challengelen=challengelen, keylen=16)[:challengelen]
         resp = hexlify(resp).decode('utf-8').upper()
         return resp
 
     def selftest(self):
-        challenge = "8101A18AB3C3E66A"  # Verified, EM7305
-        devicegeneration = "MDM9x15"  # MSM9200
-        openlock = self.run(devicegeneration, challenge, 0)
-        if openlock != 'D1E128FCA8A963ED':
-            return False
-
-        challenge = "BE96CBBEE0829BCA"  # Verified
-        devicegeneration = "MDM9x40"
-        openlock = self.run(devicegeneration, challenge, 0)
-        if openlock != '1033773720F6EE66':
-            return False
-
-        devicegeneration = "MDM9x30"
-        openlock = self.run(devicegeneration, challenge, 0)
-        if openlock != '1E02CE6A98B7DD2A':
-            return False
-
-        devicegeneration = "MDM9x50"
-        openlock = self.run(devicegeneration, challenge, 0)
-        if openlock != '32AB617DB4B1C205':
-            return False
-
-        devicegeneration = "MDM9x06"
-        openlock = self.run(devicegeneration, challenge, 0)
-        if openlock != '28D718CCD669DEDE':
-            return False
-
-        devicegeneration = "MDM9x07"
-        openlock = self.run(devicegeneration, challenge, 0)
-        if openlock != 'F5A4C9A0D402E34E':
-            return False
-
-        devicegeneration = "MDM8200"
-        openlock = self.run(devicegeneration, challenge, 0)
-        if openlock != 'EE702212D9C12FAB':
-            return False
-
-        devicegeneration = "MDM9200_V1"
-        openlock = self.run(devicegeneration, challenge, 0)
-        if openlock != 'A9A4E76E2653F753':
-            return False
-
-        devicegeneration = "MDM9200_V2"
-        openlock = self.run(devicegeneration, challenge, 0)
-        if openlock != '8B0FAB4B6F81B080':
-            return False
-
-        devicegeneration = "MDM9200_V3"
-        openlock = self.run(devicegeneration, challenge, 0)
-        if openlock != '4A69AD8A69F390E0':
-            return False
-
-        devicegeneration = "MDM9x30_V1"
-        openlock = self.run(devicegeneration, challenge, 0)
-        if openlock != '6A5E4C9CBCBDA7DC':
-            return False
-
-        challenge = "BE96CBBEE0829BCA"  # Verified
-        devicegeneration = "MDM9200"
-        openlock = self.run(devicegeneration, challenge, 0)
-        if openlock != 'EEDBF8BFF8DAE346':
-            return False
-
-        challenge = "20E253156762DACE" # Verified
-        devicegeneration = "SDX55"
-        openlock = self.run(devicegeneration, challenge, 0)
-        if openlock != '03940D7067145323':
-            return False
-
-        challenge = "2387885E7D290FEE" # Verified
-        devicegeneration = "MDM9x15A"
-        openlock = self.run(devicegeneration, challenge, 0)
-        if openlock != '676E10308BF05EE3':
-            return False        
-
-        return True
+        test_table=[
+            {"challenge": "8101A18AB3C3E66A", "devicegeneration": "MDM9x15", "response": "D1E128FCA8A963ED"},
+            {"challenge": "BE96CBBEE0829BCA", "devicegeneration": "MDM9x40", "response": "1033773720F6EE66"},
+            {"challenge": "BE96CBBEE0829BCA", "devicegeneration": "MDM9x30", "response": "1E02CE6A98B7DD2A"},
+            {"challenge": "BE96CBBEE0829BCA", "devicegeneration": "MDM9x50", "response": "32AB617DB4B1C205"},
+            {"challenge": "BE96CBBEE0829BCA", "devicegeneration": "MDM9x06", "response": "28D718CCD669DEDE"},
+            {"challenge": "BE96CBBEE0829BCA", "devicegeneration": "MDM9x07", "response": "F5A4C9A0D402E34E"},
+            {"challenge": "BE96CBBEE0829BCA", "devicegeneration": "MDM8200", "response": "EE702212D9C12FAB"},
+            {"challenge": "BE96CBBEE0829BCA", "devicegeneration": "MDM9200_V1", "response": "A9A4E76E2653F753"},
+            {"challenge": "BE96CBBEE0829BCA", "devicegeneration": "MDM9200_V2", "response": "8B0FAB4B6F81B080"},
+            {"challenge": "BE96CBBEE0829BCA", "devicegeneration": "MDM9200_V3", "response": "4A69AD8A69F390E0"},
+            {"challenge": "BE96CBBEE0829BCA", "devicegeneration": "MDM9x30_V1", "response": "6A5E4C9CBCBDA7DC"},
+            {"challenge": "BE96CBBEE0829BCA", "devicegeneration": "MDM9200", "response": "EEDBF8BFF8DAE346"},
+            {"challenge": "20E253156762DACE", "devicegeneration": "SDX55", "response": "03940D7067145323"},
+            {"challenge": "2387885E7D290FEE", "devicegeneration": "MDM9x15A", "response": "DC3E51897BAA9C1E"},
+        ]
+        for test in test_table:
+            challenge = test["challenge"]
+            devicegeneration = test["devicegeneration"]
+            response = test["response"]
+            openlock = self.run(devicegeneration, challenge, 0)
+            padding = " " * (16 - len(devicegeneration))
+            if openlock != response:
+                print(devicegeneration+padding+" FAILED!")
+            else:
+                print(devicegeneration+padding+" PASSED :)")
 
     def SierraPreInit(self, counter, key, keylen, challengelen, mcount):
         if counter != 0:
@@ -275,9 +223,8 @@ class SierraGenerator():
     def SierraInit(self, key, keylen):
         if keylen == 0 or keylen > 0x20:
             retval = [0, keylen]
-        elif keylen >= 1 and keylen <= 0x20:
-            for i in range(0, 0x100):
-                self.tbl[i] = i & 0xFF
+        elif 1 <= keylen <= 0x20:
+            self.tbl = [(i&0xFF) for i in range(0, 0x100)]
             mcount = 0
             cl = keylen & 0xffffff00
             i = 0xFF
@@ -343,8 +290,7 @@ class SierraGenerator():
         return self.rtbl[ret] & 0xFF
 
     def SierraFinish(self):
-        for i in range(0, 0x100):
-            self.tbl[i] = 0
+        self.tbl = [0 for _ in range(0, 0x100)]
         self.rtbl[0] = 0
         self.rtbl[1] = 0
         self.rtbl[2] = 0
@@ -352,13 +298,12 @@ class SierraGenerator():
         self.rtbl[4] = 0
         return 1
 
-    def SierraKeygen(self, challenge, key, challengelen, keylen):
-        resultbuffer = bytearray()
-        for i in range(0, 0x100 + 1):
-            resultbuffer.append(0x0)
+    def SierraKeygen(self, challenge:bytearray, key: bytearray, challengelen:int, keylen:int):
+        challenge = challenge
+        resultbuffer=bytearray([0 for _ in range(0, 0x100 + 1)])
         ret, keylen = self.SierraInit(key, keylen)
         if ret:
-            for i in range(0, challengelen):
+            for _ in range(0, challengelen):
                 exec(prodtable[self.devicegeneration]["run"]) # uses challenge
             self.SierraFinish()
         return resultbuffer
@@ -435,27 +380,26 @@ class SierraKeygen:
     def __init__(self,cn,devicegeneration=None):
         self.cn=cn
         self.keygen = SierraGenerator()
-        print("Running self-test ...")
-        if self.keygen.selftest():
-            print("PASSED!")
-        else:
-            print("FAILED!")
         if devicegeneration==None:
             self.detectdevicegeneration()
         else:
             self.devicegeneration=devicegeneration
+
+    def run_selftest(self):
+        print("Running self-test ...")
+        self.keygen.selftest()
 
     def detectdevicegeneration(self):
         if self.cn.connected:
             info = self.cn.send("ATI")
             if info != -1:
                 revision = ""
-                model = ""
+                _model = ""
                 for line in info:
                     if "Revision" in line:
                         revision = line.split(":")[1].strip()
                     if "Model" in line:
-                        model = line.split(":")[1].strip()
+                        _model = line.split(":")[1].strip()
                 if revision != "":
                     if "9200" in revision:
                         devicegeneration = "MDM9200" #AC762S NTG9200H2_03.05.14.12ap
@@ -469,6 +413,8 @@ class SierraKeygen:
                             devicegeneration = "MDM9x15A" #Aircard 779S
                         elif "NTG9X15C" in revision:
                             devicegeneration = "MDM9200" #AC770S NTG9X15C_01.18.02.00
+                        elif "9X15A" in revision:
+                            devicegeneration = "MDM9x15A"
                         else:
                             devicegeneration = "MDM9x15"
                     elif "9X30" in revision:
@@ -489,6 +435,8 @@ class SierraKeygen:
                         if "NTGX55" in revision: #MR5100 NTGX55_10.25.15.02
                             devicegeneration = "SDX55"
                         devicegeneration = "SDX55"
+                    else:
+                        devicegeneration = ""
                     #Missing:
                     # SDX24 Sierra
                     # MR2100 NTGX24_10.17.03.00
@@ -514,12 +462,13 @@ class SierraKeygen:
         if info != -1:
             if len(info) > 2:
                 challenge = info[1]
+                print("Received challenge: "+info[1])
         else:
             print("Error on AT!OPENLOCK? request. Aborting.")
-            return
+            return False
         if challenge == "":
             print("Error: Couldn't get challenge. Aborting.")
-            return
+            return False
         resp = self.keygen.run(self.devicegeneration, challenge, 0)
         print("Sending AT!OPENLOCK=\"" + resp + "\" response.")
         info = self.cn.send("AT!OPENLOCK=\"" + resp + "\"")
@@ -531,7 +480,7 @@ class SierraKeygen:
         return False
 
 def main(args):
-    version = "1.3"
+    version = "1.4"
     info = 'Sierra Wireless Generator ' + version + ' (c) B. Kerler 2019-2021'
     parser = argparse.ArgumentParser(formatter_class=argparse.RawDescriptionHelpFormatter,description=info)
 
@@ -552,7 +501,7 @@ def main(args):
 
     parser.add_argument(
         '-devicegeneration', '-d',
-        help='Device devicegeneration generation',
+        help='device generation',
         default="")
 
     parser.add_argument(
@@ -565,6 +514,11 @@ def main(args):
         help='use com port for openlock',
         default=False, action='store_true')
 
+    parser.add_argument(
+        '-selftest', '-s',
+        help='run selftest',
+        default=False, action='store_true')
+
     args = parser.parse_args()
 
     openlock = args.openlock
@@ -572,34 +526,39 @@ def main(args):
     opencnd = args.opencnd
     devicegeneration = args.devicegeneration
 
-    if (devicegeneration == "" or (openlock == "" and openmep == "" and opencnd == "")) and not args.unlock:
-        print(info)
-        print("------------------------------------------------------------\n")
-        print("Usage: ./sierrakeygen [-l,-m,-c] [challenge] -d [devicegeneration]")
-        print("Example: ./sierrakeygen.py -l BE96CBBEE0829BCA -d MDM9200")
-        print("or: ./sierrakeygen.py -u for auto unlock")
-        print("or: ./sierrakeygen.py -u -p [portname] for auto unlock with given portname")
-        print("Supported devicegenerations :")
-        for key in infotable:
-            info = f"\t{key}:\t\t"
-            count = 0
-            for item in infotable[key]:
-                count += 1
-                if count > 15:
-                    info += "\n\t\t\t\t\t"
-                    count = 0
-                info += item + ","
-
-            info = info[:-1]
+    if not args.selftest:
+        if (devicegeneration == "" or (openlock == "" and openmep == "" and opencnd == "")) and not args.unlock:
             print(info)
-        exit(0)
+            print("------------------------------------------------------------\n")
+            print("Usage: ./sierrakeygen.py [-l,-m,-c] [challenge] -d [devicegeneration]")
+            print("Example: ./sierrakeygen.py.py -l BE96CBBEE0829BCA -d MDM9200")
+            print("or: ./sierrakeygen.py.py -u for auto unlock")
+            print("or: ./sierrakeygen.py.py -u -p [portname] for auto unlock with given portname")
+            print("or: ./sierrakeygen.py.py -s for self-test")
+            print("Supported devicegenerations :")
+            for key in infotable:
+                info = f"\t{key}:\t\t"
+                count = 0
+                for item in infotable[key]:
+                    count += 1
+                    if count > 15:
+                        info += "\n\t\t\t\t\t"
+                        count = 0
+                    info += item + ","
 
-    if devicegeneration == "" and not args.unlock:
-        print("You need to specific a device generation as well. Option -d")
-        exit(0)
+                info = info[:-1]
+                print(info)
+            exit(0)
+
+        if devicegeneration == "" and not args.unlock:
+            print("You need to specific a device generation as well. Option -d")
+            exit(0)
     if devicegeneration == "":
         devicegeneration=None
-    if args.unlock:
+    if args.selftest:
+        kg=SierraKeygen(None,"selftest")
+        kg.run_selftest()
+    elif args.unlock:
         cn = connection(args.port)
         if cn.connected:
             kg=SierraKeygen(cn,devicegeneration)
